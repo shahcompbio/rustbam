@@ -1,6 +1,8 @@
 use pyo3::prelude::*;
-use rust_htslib::bam::{Read, IndexedReader};
-use std::collections::{BTreeMap, HashSet};  // ✅ Sorted dictionary + Fast lookups
+use rust_htslib::bam::{Read, IndexedReader, pileup::Pileup};
+use rayon::prelude::*;
+use std::collections::BTreeMap;
+use std::sync::{Arc, Mutex};
 
 #[pyfunction]
 fn get_depths(
@@ -9,62 +11,75 @@ fn get_depths(
     start: u64, 
     end: u64, 
     step: u64, 
-    min_mapq: u8,  // Equivalent to samtools -q
-    min_bq: u8,    // Equivalent to samtools -Q
-    max_depth: usize // Equivalent to samtools -d
+    min_mapq: u8,  
+    min_bq: u8,    
+    max_depth: usize, 
+    num_threads: usize  
 ) -> PyResult<BTreeMap<u64, u32>> {  
 
-    let mut bam = IndexedReader::from_path(bam_path)
-        .map_err(|e| pyo3::exceptions::PyIOError::new_err(format!("Failed to open BAM: {}", e)))?;
+    let tid = {
+        let bam = IndexedReader::from_path(bam_path)
+            .map_err(|e| pyo3::exceptions::PyIOError::new_err(format!("Failed to open BAM: {}", e)))?;
+        bam.header().tid(chromosome.as_bytes()).ok_or_else(|| {
+            pyo3::exceptions::PyValueError::new_err(format!("Chromosome {} not found in BAM header", chromosome))
+        })?
+    };
 
-    let tid = bam.header().tid(chromosome.as_bytes()).ok_or_else(|| {
-        pyo3::exceptions::PyValueError::new_err(format!("Chromosome {} not found in BAM header", chromosome))
-    })?;
+    let depths = Arc::new(Mutex::new(BTreeMap::<u64, u32>::new()));
 
-    // ✅ **Single fetch for entire region (avoiding multiple `fetch()` calls)**
-    bam.fetch((tid, start as i64 - 1, end as i64))
-        .map_err(|e| pyo3::exceptions::PyIOError::new_err(format!("Failed to fetch region: {}", e)))?;
+    let chunk_size = (end - start) / num_threads as u64;
+    let step_positions: Vec<u64> = (start..=end).step_by(step as usize).collect();
 
-    let mut depths: BTreeMap<u64, u32> = BTreeMap::new();
-    let valid_positions: HashSet<u64> = (start..=end).step_by(step as usize).collect();  // ✅ Fast lookup for step positions
+    // ✅ **Parallelize over independent regions**
+    (0..num_threads).into_par_iter().for_each(|i| {
+        let chunk_start = start + i as u64 * chunk_size;
+        let chunk_end = if i == num_threads - 1 { end } else { chunk_start + chunk_size };
 
-    let mut pileup_engine = bam.pileup();
-    pileup_engine.set_max_depth(max_depth as u32);
+        let mut bam_thread = IndexedReader::from_path(bam_path).expect("Failed to open BAM file");
+        bam_thread.fetch((tid, chunk_start as i64 - 1, chunk_end as i64)).expect("Failed to fetch region");
 
-    let mut last_step = start;
+        let mut pileup_engine = bam_thread.pileup();
+        pileup_engine.set_max_depth(max_depth as u32);
 
-    while let Some(pileup) = pileup_engine.next() {
-        let pileup = pileup.map_err(|e| pyo3::exceptions::PyRuntimeError::new_err(format!("Error in pileup: {}", e)))?;
-        let pos = pileup.pos() as u64 + 1;
+        let mut local_depths: BTreeMap<u64, u32> = BTreeMap::new();
 
-        // ✅ **Skip until reaching the next step position**
-        if pos < last_step { continue; }
-        if !valid_positions.contains(&pos) { continue; }
+        while let Some(pileup) = pileup_engine.next() {
+            let pileup = pileup.expect("Error in pileup");
+            let pos = pileup.pos() as u64 + 1;
 
-        let mut filtered_depth = 0;
-
-        for alignment in pileup.alignments() {
-            let record = alignment.record();
-
-            const FLAG_FILTER: u16 = 0x4 | 0x100 | 0x800 | 0x400 | 0x200;
-            if record.flags() & FLAG_FILTER != 0 { continue; }
-
-            if record.mapq() < min_mapq { continue; }
-
-            if let Some(qpos) = alignment.qpos() {
-                if record.qual()[qpos] < min_bq { continue; }
+            if !step_positions.contains(&pos) {
+                continue; 
             }
 
-            filtered_depth += 1;
+            let mut filtered_depth = 0;
 
-            if filtered_depth >= max_depth as u32 { break; }
+            for alignment in pileup.alignments() {
+                let record = alignment.record();
+
+                const FLAG_FILTER: u16 = 0x4 | 0x100 | 0x800 | 0x400 | 0x200;
+                if record.flags() & FLAG_FILTER != 0 { continue; }
+
+                if record.mapq() < min_mapq { continue; }
+
+                if let Some(qpos) = alignment.qpos() {
+                    if record.qual()[qpos] < min_bq { continue; }
+                }
+
+                filtered_depth += 1;
+
+                if filtered_depth >= max_depth as u32 { break; }
+            }
+
+            local_depths.insert(pos, filtered_depth);
         }
 
-        depths.insert(pos, filtered_depth);
-        last_step = pos + step;  // ✅ **Jump to next valid step**
-    }
+        // ✅ **Safely merge local results into global depths**
+        let mut global_depths = depths.lock().unwrap();
+        global_depths.extend(local_depths);
+    });
 
-    Ok(depths)  // ✅ Sorted by default
+    let final_result = Arc::try_unwrap(depths).unwrap().into_inner().unwrap();
+    Ok(final_result)
 }
 
 

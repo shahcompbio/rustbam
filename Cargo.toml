@@ -1,11 +1,12 @@
 [package]
 name = "rustbam"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 
 [dependencies]
 pyo3 = { version = "0.20", features = ["extension-module"] }
 rust-htslib = "0.43"  # HTSlib wrapper for BAM processing
+rayon = "1.8" # Parallelization
 
 [lib]
 crate-type = ["cdylib"]
