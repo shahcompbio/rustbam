@@ -1,0 +1,22 @@
+[build-system]
+requires = ["maturin>=1.0"]
+build-backend = "maturin"
+
+[project]
+name = "rustbam"
+version = "0.1.0"
+authors = [
+    { name = "Seongmin Choi", email = "soymintc@gmail.com" }
+]
+description = "A Rust-based BAM depth calculator for Python."
+readme = "README.md"
+license = { text = "MIT" }
+classifiers = [
+    "Programming Language :: Python",
+    "Programming Language :: Rust",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+]
+requires-python = ">=3.7"
+
+[tool.maturin]
+bindings = "pyo3"

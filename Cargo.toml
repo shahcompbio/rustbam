@@ -1,0 +1,20 @@
+[package]
+name = "rustbam"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+pyo3 = { version = "0.20", features = ["extension-module"] }
+rust-htslib = "0.43"  # HTSlib wrapper for BAM processing
+
+[lib]
+crate-type = ["cdylib"]
+name = "rustbam"
+path = "src/lib.rs"
+
+[package.metadata]
+test_assets = ["tests/example.bam"]
+
+[[test]]
+name = "integration_test"
+path = "tests/integration_test.rs"
