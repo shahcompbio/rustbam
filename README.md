@@ -1,6 +1,6 @@
-# 🦀 rustbam - Fast BAM Depth Calculator in Rust & Python
+# 🦀 `rustbam` - Rust-powered fast BAM depth extraction with Python bindings
 
-🚀 **rustbam** is a high-performance BAM depth calculator written in **Rust**, with **Python bindings** for fast and efficient genomic data analysis. It offers a `pysam`-like API but is significantly faster due to Rust’s performance advantages.
+🚀 **rustbam** is a high-performance BAM depth calculator written in **Rust**, with **Python bindings** for fast and efficient genomic data analysis.
 
 ## 📦 Installation  
 
@@ -18,16 +18,12 @@ pip install rustbam
 
 After installation, you can use `rustbam` in Python:
 
-python
-
-CopyEdit
-
-```
+```bash
 import rustbam
-depths = rustbam.get_depth("example.bam", "chr1", 1000000, 1000100, 
-    step=10,     # As in range(start, end, step)
-    min_mapq=0,  # Minimum mapping quality (samtools -q)
-    min_bq=13,   # Minimum base quality (samtools -Q)
+depths = rustbam.get_depth("example.bam", 
+    "chr1", 1000000, 1000100, step=10, # As in range(start, end, step)
+    min_mapq=0,     # Minimum mapping quality (samtools -q)
+    min_bq=13,      # Minimum base quality (samtools -Q)
     max_depth=8000  # Max per-file depth (samtools -d)
 )
 print(depths)
