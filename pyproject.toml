@@ -4,7 +4,7 @@ build-backend = "maturin"
 
 [project]
 name = "rustbam"
-version = "0.1.2"
+version = "0.1.3"
 authors = [
     { name = "Seongmin Choi", email = "soymintc@gmail.com" }
 ]

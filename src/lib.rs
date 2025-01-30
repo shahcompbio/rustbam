@@ -17,38 +17,49 @@ fn get_depths(
     num_threads: usize  
 ) -> PyResult<BTreeMap<u64, u32>> {  
 
-    let tid = {
-        let bam = IndexedReader::from_path(bam_path)
-            .map_err(|e| pyo3::exceptions::PyIOError::new_err(format!("Failed to open BAM: {}", e)))?;
-        bam.header().tid(chromosome.as_bytes()).ok_or_else(|| {
-            pyo3::exceptions::PyValueError::new_err(format!("Chromosome {} not found in BAM header", chromosome))
-        })?
-    };
+    let mut bam = IndexedReader::from_path(bam_path)
+        .map_err(|e| pyo3::exceptions::PyIOError::new_err(format!("Failed to open BAM: {}", e)))?;
+
+    let tid = bam.header().tid(chromosome.as_bytes()).ok_or_else(|| {
+        pyo3::exceptions::PyValueError::new_err(format!("Chromosome {} not found in BAM header", chromosome))
+    })?;
+
+    // ✅ **Calculate chunk boundaries using integer division**
+    let chunk_starts: Vec<u64> = (0..num_threads)
+        .map(|i| (start as f64 + ((end - start) as f64 / num_threads as f64 * i as f64)).floor() as u64)
+        .collect();
+    
+    let chunk_ends: Vec<u64> = (0..num_threads)
+        .map(|i| (start as f64 + ((end - start) as f64 / num_threads as f64 * (i + 1) as f64)).floor() as u64)
+        .collect();
 
     let depths = Arc::new(Mutex::new(BTreeMap::<u64, u32>::new()));
 
-    let chunk_size = (end - start) / num_threads as u64;
-    let step_positions: Vec<u64> = (start..=end).step_by(step as usize).collect();
+    // ✅ **Initialize all positions to 0 before processing**
+    for pos in (start..=end).step_by(step as usize) {
+        depths.lock().unwrap().insert(pos, 0);
+    }
 
-    // ✅ **Parallelize over independent regions**
+    // ✅ **Parallelize over properly divided chunk boundaries**
     (0..num_threads).into_par_iter().for_each(|i| {
-        let chunk_start = start + i as u64 * chunk_size;
-        let chunk_end = if i == num_threads - 1 { end } else { chunk_start + chunk_size };
+        let chunk_start = chunk_starts[i];
+        let chunk_end = chunk_ends[i];
 
         let mut bam_thread = IndexedReader::from_path(bam_path).expect("Failed to open BAM file");
         bam_thread.fetch((tid, chunk_start as i64 - 1, chunk_end as i64)).expect("Failed to fetch region");
 
+        let mut local_depths: BTreeMap<u64, u32> = BTreeMap::new();
+
         let mut pileup_engine = bam_thread.pileup();
         pileup_engine.set_max_depth(max_depth as u32);
 
-        let mut local_depths: BTreeMap<u64, u32> = BTreeMap::new();
-
         while let Some(pileup) = pileup_engine.next() {
             let pileup = pileup.expect("Error in pileup");
-            let pos = pileup.pos() as u64 + 1;
+            let pos = pileup.pos() as u64 + 1; // Convert 0-based to 1-based
 
-            if !step_positions.contains(&pos) {
-                continue; 
+            // ✅ **Only process positions that are part of the pre-defined chunk**
+            if pos < chunk_start || pos >= chunk_end || (pos - start) % step != 0 {
+                continue;
             }
 
             let mut filtered_depth = 0;

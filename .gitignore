@@ -19,3 +19,4 @@ target/
 .ipynb_*
 .ipynb_*/
 notebooks/
+Cargo.lock
