@@ -20,7 +20,7 @@ After installation, you can use `rustbam` in Python:
 
 ```bash
 import rustbam
-depths = rustbam.get_depth("example.bam", 
+depths = rustbam.get_depths("example.bam", 
     "chr1", 1000000, 1000100, step=10, # As in range(start, end, step)
     min_mapq=0,     # Minimum mapping quality (samtools -q)
     min_bq=13,      # Minimum base quality (samtools -Q)
