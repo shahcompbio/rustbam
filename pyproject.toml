@@ -18,8 +18,6 @@ classifiers = [
 ]
 requires-python = ">=3.7"
 keywords = ["bam", "bioinformatics", "genomics", "rust", "parallel"]
-homepage = "https://github.com/soymintc/rustbam"
-repository = "https://github.com/soymintc/rustbam"
 
 [tool.maturin]
 bindings = "pyo3"
