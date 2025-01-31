@@ -9,7 +9,7 @@ rust-htslib = "0.43"  # HTSlib wrapper for BAM processing
 rayon = "1.8" # Parallelization
 
 [lib]
-crate-type = ["cdylib"]
+crate-type = ["cdylib", "rlib"]
 name = "rustbam"
 path = "src/lib.rs"
 
