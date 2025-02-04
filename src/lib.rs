@@ -12,40 +12,39 @@ use std::sync::{Arc, Mutex};
 /// within a given region using a BAM file. It supports multi-threaded processing and allows
 /// filtering based on mapping quality (MAPQ), base quality (BQ), and depth thresholds.
 ///
-/// # Arguments
-/// * `bam_path` - Path to the indexed BAM file.
-/// * `chromosome` - The chromosome name (e.g., `"chr1"`, `"chrX"`).
-/// * `start` - 1-based start position (inclusive).
-/// * `end` - 1-based end position (inclusive).
-/// * `step` - Step size for sampling positions (default: 1).
-/// * `min_mapq` - Minimum mapping quality for alignments (default: 0).
-/// * `min_bq` - Minimum base quality for bases included in depth calculation (default: 13).
-/// * `max_depth` - Maximum depth allowed at any position (default: 8000).
-/// * `num_threads` - Number of threads for parallel processing (default: 12).
+/// Args:
+///     bam_path (str): Path to the indexed BAM file.
+///     chromosome (str): Chromosome name (e.g., `"chr1"`, `"chrX"`).
+///     start (int): 1-based start position (inclusive).
+///     end (int): 1-based end position (inclusive).
+///     step (int, optional): Step size for sampling positions (default: 1).
+///     min_mapq (int, optional): Minimum mapping quality for alignments (default: 0).
+///     min_bq (int, optional): Minimum base quality for bases included in depth calculation (default: 13).
+///     max_depth (int, optional): Maximum depth allowed at any position (default: 8000).
+///     num_threads (int, optional): Number of threads for parallel processing (default: 12).
 ///
-/// # Returns
-/// A tuple containing:
-/// * `Vec<u64>` - List of genomic positions (1-based).
-/// * `Vec<u32>` - Corresponding list of sequencing depths.
+/// Returns:
+///     Tuple[List[int], List[int]]: A tuple containing:
+///         - List[int]: Genomic positions (1-based).
+///         - List[int]: Corresponding sequencing depths.
 ///
-/// # Errors
-/// * Returns `PyIOError` if the BAM file cannot be opened or indexed.
-/// * Returns `PyValueError` if the specified chromosome is not found in the BAM header.
+/// Raises:
+///     IOError: If the BAM file cannot be opened or indexed.
+///     ValueError: If the specified chromosome is not found in the BAM header.
 ///
-/// # Example (Python)
-/// ```python
-/// import rustbam
-/// positions, depths = rustbam.get_depths(
-///     "example.bam", "chr1", 100000, 200000, step=10, 
-///     min_mapq=30, min_bq=20, max_depth=5000, num_threads=4
-/// )
-/// print(positions[:5])  # [100000, 100010, 100020, 100030, 100040]
-/// print(depths[:5])     # [12, 15, 10, 8, 20]
-/// ```
+/// Notes:
+///     - The BAM file must be indexed using `samtools index`.
+///     - Uses a 1-based genomic coordinate system.
+///     - Multi-threading is enabled using `rayon` for faster performance.
 ///
-/// # Notes
-/// * The BAM file must be indexed (e.g., using `samtools index`).
-/// * Uses 1-based genomic coordinate system.
+/// Example:
+///     >>> import rustbam
+///     >>> positions, depths = rustbam.get_depths(
+///     ...     "example.bam", "chr1", 100000, 200000, step=10, 
+///     ...     min_mapq=30, min_bq=20, max_depth=5000, num_threads=4
+///     ... )
+///     >>> print(positions[:5])  # [100000, 100010, 100020, 100030, 100040]
+///     >>> print(depths[:5])     # [12, 15, 10, 8, 20]
 #[pyfunction]
 #[pyo3(signature = (
     bam_path,
