@@ -4,7 +4,7 @@ build-backend = "maturin"
 
 [project]
 name = "rustbam"
-version = "0.1.4"
+version = "0.1.5"
 authors = [
     { name = "Seongmin Choi", email = "soymintc@gmail.com" }
 ]
@@ -21,3 +21,6 @@ keywords = ["bam", "bioinformatics", "genomics", "rust", "parallel"]
 
 [tool.maturin]
 bindings = "pyo3"
+
+[project.scripts]
+rustbam = "rustbam.__main__:main"
