@@ -6,7 +6,46 @@ use rust_htslib::bam::Read;
 use rayon::prelude::*;
 use std::sync::{Arc, Mutex};
 
-/// Extracts sequencing depth across a genomic region, returning two arrays: positions and depths.
+/// Computes sequencing depth across a genomic region from a BAM file.
+///
+/// This function calculates the depth of sequencing coverage at specified genomic positions 
+/// within a given region using a BAM file. It supports multi-threaded processing and allows
+/// filtering based on mapping quality (MAPQ), base quality (BQ), and depth thresholds.
+///
+/// # Arguments
+/// * `bam_path` - Path to the indexed BAM file.
+/// * `chromosome` - The chromosome name (e.g., `"chr1"`, `"chrX"`).
+/// * `start` - 1-based start position (inclusive).
+/// * `end` - 1-based end position (inclusive).
+/// * `step` - Step size for sampling positions (default: 1).
+/// * `min_mapq` - Minimum mapping quality for alignments (default: 0).
+/// * `min_bq` - Minimum base quality for bases included in depth calculation (default: 13).
+/// * `max_depth` - Maximum depth allowed at any position (default: 8000).
+/// * `num_threads` - Number of threads for parallel processing (default: 12).
+///
+/// # Returns
+/// A tuple containing:
+/// * `Vec<u64>` - List of genomic positions (1-based).
+/// * `Vec<u32>` - Corresponding list of sequencing depths.
+///
+/// # Errors
+/// * Returns `PyIOError` if the BAM file cannot be opened or indexed.
+/// * Returns `PyValueError` if the specified chromosome is not found in the BAM header.
+///
+/// # Example (Python)
+/// ```python
+/// import rustbam
+/// positions, depths = rustbam.get_depths(
+///     "example.bam", "chr1", 100000, 200000, step=10, 
+///     min_mapq=30, min_bq=20, max_depth=5000, num_threads=4
+/// )
+/// print(positions[:5])  # [100000, 100010, 100020, 100030, 100040]
+/// print(depths[:5])     # [12, 15, 10, 8, 20]
+/// ```
+///
+/// # Notes
+/// * The BAM file must be indexed (e.g., using `samtools index`).
+/// * Uses 1-based genomic coordinate system.
 #[pyfunction]
 #[pyo3(signature = (
     bam_path,

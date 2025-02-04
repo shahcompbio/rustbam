@@ -20,3 +20,4 @@ target/
 .ipynb_*/
 notebooks/
 Cargo.lock
+.develop.sh
