@@ -2,7 +2,7 @@ use clap::{Arg, Command};
 use rustbam::get_depths;
 
 fn main() {
-    let matches = Command::new("rustbam-cli")
+    let matches = Command::new("rustbam")
         .about("Extract sequencing depth from a BAM file")
         .arg(Arg::new("bam").required(true).help("Path to the BAM file"))
         .arg(Arg::new("chromosome").required(true).help("Chromosome name"))

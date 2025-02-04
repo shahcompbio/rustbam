@@ -20,14 +20,23 @@ After installation, you can use `rustbam` in Python:
 
 ```bash
 import rustbam
-depths = rustbam.get_depths("example.bam", 
-    "chr1", 1000000, 1000100, step=10, # As in range(start, end, step)
-    min_mapq=0,     # Minimum mapping quality (samtools -q)
-    min_bq=13,      # Minimum base quality (samtools -Q)
-    max_depth=8000  # Max per-file depth (samtools -d)
+
+positions, depths = rustbam.get_depths(
+    bam_path,         # path to bam file
+    chromosome,       # chromosome/contig name
+    start,            # 1-based inclusive start coordinate
+    end,              # 1-based inclusive end coordinate
+    step=1,           # step as in range(start, end, step) - default: 1
+    min_mapq=0,       # minimum mapping quality - default 0
+    min_bq=13,        # minimum base quality - default 13 (as in samtools mpileup)
+    max_depth=8000,   # maximum depth to return per base position
+    num_threads=12,   # number of threads for parallelization
 )
-print(depths)
+
+print(positions[:5])  # e.g. [100000, 100010, 100020, 100030, 100040]
+print(depths[:5])     # e.g. [12, 15, 10, 8, 20]
 ```
+
 
 ### **CLI (Command Line Interface)**
 

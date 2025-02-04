@@ -22,5 +22,5 @@ keywords = ["bam", "bioinformatics", "genomics", "rust", "parallel"]
 [tool.maturin]
 bindings = "pyo3"
 
-[project.scripts]
-rustbam = "rustbam.__main__:main"
+[tool.maturin.scripts]
+rustbam = "rustbam"
