@@ -21,3 +21,4 @@ target/
 notebooks/
 Cargo.lock
 .develop.sh
+*.so

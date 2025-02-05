@@ -81,9 +81,10 @@ pub fn get_depths(
         .map(|i| (start as f64 + ((end - start) as f64 / num_threads as f64 * i as f64)).floor() as u64)
         .collect();
     
-    let chunk_ends: Vec<u64> = (0..num_threads)
+    let mut chunk_ends: Vec<u64> = (0..num_threads)
         .map(|i| (start as f64 + ((end - start) as f64 / num_threads as f64 * (i + 1) as f64)).floor() as u64)
         .collect();
+    chunk_ends[num_threads - 1] = end + 1; // Ensure last chunk reaches `end`
 
     // **Store results in parallel-safe vectors**
     let positions = Arc::new(Mutex::new(Vec::<u64>::new()));
@@ -120,7 +121,7 @@ pub fn get_depths(
             for alignment in pileup.alignments() {
                 let record = alignment.record();
 
-                const FLAG_FILTER: u16 = 0x4 | 0x100 | 0x800 | 0x400 | 0x200;
+                const FLAG_FILTER: u16 = 0x4 | 0x100 | 0x400 | 0x200;
                 if record.flags() & FLAG_FILTER != 0 { continue; }
 
                 if record.mapq() < min_mapq { continue; }
@@ -160,7 +161,7 @@ pub fn get_depths(
 
 /// Python module definition
 #[pymodule]
-fn rustbam(_py: Python, m: &PyModule) -> PyResult<()> {
+fn _rustbam(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(get_depths, m)?)?;
     Ok(())
 }

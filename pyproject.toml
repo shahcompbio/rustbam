@@ -19,8 +19,12 @@ classifiers = [
 requires-python = ">=3.7"
 keywords = ["bam", "bioinformatics", "genomics", "rust", "parallel"]
 
+[project.scripts]
+rustbam = "rustbam.cli:get_depths_cli"
+
 [tool.maturin]
 bindings = "pyo3"
+module-name = "rustbam._rustbam"
 
-[tool.maturin.scripts]
-rustbam = "rustbam"
+[tool.setuptools]
+packages = ["rustbam"]

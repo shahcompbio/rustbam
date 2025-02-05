@@ -1,6 +1,6 @@
 # 🦀 `rustbam` - Rust-powered fast BAM depth extraction with Python bindings
 
-🚀 **rustbam** is a high-performance BAM depth calculator written in **Rust**, with **Python bindings** for fast and efficient genomic data analysis.
+**rustbam** is a high-performance BAM depth calculator written in **Rust**, with **Python bindings** for fast and efficient genomic data analysis.
 
 ## 📦 Installation  
 
@@ -26,7 +26,7 @@ positions, depths = rustbam.get_depths(
     chromosome,       # chromosome/contig name
     start,            # 1-based inclusive start coordinate
     end,              # 1-based inclusive end coordinate
-    step=1,           # step as in range(start, end, step) - default: 1
+    step=10,          # step as in range(start, end, step) - default: 1
     min_mapq=0,       # minimum mapping quality - default 0
     min_bq=13,        # minimum base quality - default 13 (as in samtools mpileup)
     max_depth=8000,   # maximum depth to return per base position
@@ -40,13 +40,42 @@ print(depths[:5])     # e.g. [12, 15, 10, 8, 20]
 
 ### **CLI (Command Line Interface)**
 
-Coming soon! 🚀
+After installation, you can use `rustbam` in your shell (note that coordinates are 1-based and inclusive, as in `samtools mpileup`):
+
+```bash
+$ rustbam tests/example.bam chr1 1000000 1000005
+1000000 51
+1000001 52
+1000002 44
+1000003 52
+1000004 53
+1000005 47
+```
+
+You can get much faster depths result compared to samtools mpileup (as long as you use the multithreading option, `-n`):
+
+```bash
+$ time samtools mpileup /path/to/a/large/bam -r chr1:1-30000000 > /dev/null
+[mpileup] 1 samples in 1 input files
+
+real    0m52.897s
+user    0m52.270s
+sys     0m0.436s
+
+$ time rustbam /path/to/a/large/bam chr1 1 30000000 -n 12 > /dev/null
+
+real    0m18.725s
+user    0m50.806s
+sys     0m6.303s
+```
+
+Don't even get me started about `pysam`. 😠
 
 ---
 
 ## 🔥 Features
 
-✅ **Fast**: Uses Rust’s efficient `rust-htslib` for BAM processing.  
+✅ **Fast**: Uses Rust’s efficient `rust-htslib` for BAM processing, and supports parallelism.
 ✅ **Python bindings**: Seamless integration with Python via `pyo3`.  
 ✅ **Custom filtering**: Supports read quality (`-q`), base quality (`-Q`), and max depth (`-d`).  
 ✅ **Supports large BAM files**: Uses `IndexedReader` for efficient region querying.

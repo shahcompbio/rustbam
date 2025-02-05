@@ -3,15 +3,10 @@ name = "rustbam"
 version = "0.1.5"
 edition = "2021"
 
-[[bin]]
-name = "rustbam"  # CLI command as `rustbam`
-path = "src/main.rs"
-
 [dependencies]
-pyo3 = { version = "0.20", features = ["extension-module"] }
+pyo3 = { version = "0.20", features = ["extension-module", "auto-initialize"] }
 rust-htslib = "0.43"  # HTSlib wrapper for BAM processing
 rayon = "1.8" # Parallelization
-clap = { version = "4.4", features = ["derive"] }
 
 [lib]
 crate-type = ["cdylib", "rlib"]
