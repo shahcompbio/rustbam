@@ -43,6 +43,34 @@ print(depths[:5])     # e.g. [12, 15, 10, 8, 20]
 After installation, you can use `rustbam` in your shell (note that coordinates are 1-based and inclusive, as in `samtools mpileup`):
 
 ```bash
+$ rustbam --help
+usage: rustbam [-h] [-t STEP] [-Q MIN_MAPQ] [-q MIN_BQ] [-d MAX_DEPTH] [-n NUM_THREADS] [-j] bam chromosome start end
+
+Compute sequencing depth from a BAM file.
+
+positional arguments:
+  bam                   Path to the indexed BAM file
+  chromosome            Chromosome name (e.g., 'chr1')
+  start                 Start position (1-based)
+  end                   End position (1-based)
+
+options:
+  -h, --help            show this help message and exit
+  -t STEP, --step STEP  Step size for sampling positions (default: 1)
+  -Q MIN_MAPQ, --min_mapq MIN_MAPQ
+                        Minimum mapping quality (default: 0)
+  -q MIN_BQ, --min_bq MIN_BQ
+                        Minimum base quality (default: 13)
+  -d MAX_DEPTH, --max_depth MAX_DEPTH
+                        Maximum depth allowed (default: 8000)
+  -n NUM_THREADS, --num_threads NUM_THREADS
+                        Number of threads (default: 12)
+  -j, --json            Output results in JSON format
+```
+
+An example usage of the CLI:
+
+```bash
 $ rustbam tests/example.bam chr1 1000000 1000005
 1000000 51
 1000001 52
