@@ -69,7 +69,7 @@ user    0m50.806s
 sys     0m6.303s
 ```
 
-Don't even get me started about `pysam`. 😠
+Don't even get me started about `pysam` (about 16x faster with `-n 12`, which is the default option). 😠
 
 ---
 
