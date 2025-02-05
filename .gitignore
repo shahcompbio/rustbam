@@ -22,3 +22,5 @@ notebooks/
 Cargo.lock
 .develop.sh
 *.so
+__pycache__
+*.swp
