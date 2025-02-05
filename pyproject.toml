@@ -17,7 +17,7 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Bio-Informatics",
 ]
 requires-python = ">=3.8"
-keywords = ["bam", "bioinformatics", "genomics", "rust", "parallel"]
+keywords = ["bam", "bioinformatics", "genomics", "rust"]
 
 [project.scripts]
 rustbam = "rustbam.cli:get_depths_cli"

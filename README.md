@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/shahcompbio/rustbam/actions/workflows/integration.yaml/badge.svg)](https://github.com/shahcompbio/rustbam/actions/workflows/integration.yaml)
 
-**rustbam** is a high-performance BAM depth calculator written in **Rust**, with **Python bindings** for fast and efficient genomic data analysis.
+`rustbam` is a high-performance BAM depth calculator written in **Rust**, with **Python bindings** for fast and efficient genomic data analysis.
 
 ## 📦 Installation  
 
@@ -13,6 +13,12 @@ You can install `rustbam` directly with `pip`:
 ```
 pip install rustbam
 ```
+
+### **Requirements**
+
+`rustbam` requires **Python ≥3.8** and a compatible Linux environment. Prebuilt wheels are available for most systems, but if you encounter installation issues, ensure your system has **glibc ≥2.17** (manylinux2014 compatibility). To check your version, run `ldd --version`. 
+
+If you need to compile from source, install **Rust** (`cargo`), **Python development headers** (`python3-dev` or `python3-devel`), and GCC (`build-essential` or `Development Tools`). For the best experience, we recommend using `pip install rustbam`, but if necessary, you can force a source installation with `pip install --no-binary rustbam rustbam`.
 
 ## 🛠️ Usage
 

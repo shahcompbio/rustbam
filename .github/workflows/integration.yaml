@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.9", "3.10", "3.11"]
+        python-version: ["3.8", "3.9", "3.10", "3.11"]
 
     steps:
       - name: Checkout repository
@@ -30,8 +30,8 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y build-essential python3-dev python3-pip cargo
 
-      - name: Install maturin
-        run: pip install maturin
+      - name: Install pytest
+        run: pip install pytest
 
       - name: Build and Install RustBam
         run: |
