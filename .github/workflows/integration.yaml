@@ -41,3 +41,5 @@ jobs:
       - name: Verify RustBam CLI
         run: rustbam --help
 
+      - name: Run Pytest
+        run: pytest -v
