@@ -4,7 +4,7 @@ build-backend = "maturin"
 
 [project]
 name = "rustbam"
-version = "0.1.5"
+version = "0.2.0"
 authors = [
     { name = "Seongmin Choi", email = "soymintc@gmail.com" }
 ]
@@ -16,7 +16,7 @@ classifiers = [
     "Programming Language :: Rust",
     "Topic :: Scientific/Engineering :: Bio-Informatics",
 ]
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 keywords = ["bam", "bioinformatics", "genomics", "rust", "parallel"]
 
 [project.scripts]
@@ -25,6 +25,7 @@ rustbam = "rustbam.cli:get_depths_cli"
 [tool.maturin]
 bindings = "pyo3"
 module-name = "rustbam._rustbam"
+features = ["pyo3/extension-module", "pyo3/abi3-py37"]
 
 [tool.setuptools]
 packages = ["rustbam"]
