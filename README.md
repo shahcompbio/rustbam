@@ -103,12 +103,9 @@ Don't even get me started about `pysam` (about 16x faster with `-n 12`, which is
 
 ## 🔥 Features
 
-✅ **Fast**: Uses Rust’s efficient `rust-htslib` for BAM processing, and supports parallelism.
-
+✅ **Fast**: Uses Rust’s efficient `rust-htslib` for BAM processing, and supports parallelism.  
 ✅ **Python bindings**: Seamless integration with Python via `pyo3`.  
-
 ✅ **Custom filtering**: Supports read quality (`-q`), base quality (`-Q`), and max depth (`-d`).  
-
 ✅ **Supports large BAM files**: Uses `IndexedReader` for efficient region querying.
 
 ---
