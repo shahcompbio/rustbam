@@ -1,12 +1,13 @@
-# 🦀 `rustbam` - Rust-powered fast BAM depth extraction with Python bindings
+# 🦀`rustbam`🐍 - Rust-powered fast BAM depth extraction with Python bindings
 
 [![CI](https://github.com/shahcompbio/rustbam/actions/workflows/integration.yaml/badge.svg)](https://github.com/shahcompbio/rustbam/actions/workflows/integration.yaml)
 
-`rustbam` is a high-performance BAM depth calculator written in **Rust**, with **Python bindings** for fast and efficient genomic data analysis.
+`rustbam` is a high-performance BAM depth calculator written in **Rust**, with **Python bindings** for fast and efficient genomic data analysis.  
+(It's only a coincidence that "bam" means "snake" in Korean.)
 
 ## 📦 Installation  
 
-### **Install from PyPI (No Conda Required)** 
+### **Install from PyPI** 
 
 You can install `rustbam` directly with `pip`:
 
@@ -105,7 +106,7 @@ user    0m50.806s
 sys     0m6.303s
 ```
 
-Don't even get me started about `pysam` (about 16x faster with `-n 12`, which is the default option). 😠
+Don't even get me started about `pysam` (`rustbam` is about 12x fater with `-n 2`). 😠
 
 ---
 
