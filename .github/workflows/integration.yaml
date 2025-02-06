@@ -35,9 +35,8 @@ jobs:
 
       - name: Build and Install RustBam
         run: |
-          maturin build --release
-          pip install --force-reinstall target/wheels/*.whl
-          pip show rustbam
+          pip install maturin
+          maturin develop
 
       - name: Verify RustBam CLI
         run: rustbam --help
