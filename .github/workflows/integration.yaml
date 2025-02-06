@@ -51,33 +51,27 @@ jobs:
           source venv/bin/activate
           coverage run -m pytest -v
           coverage report -m
-          coverage xml
 
-      - name: Verify Coverage XML
-        run: |
-          ls -lah coverage.xml || echo "coverage.xml not found"
-          cat coverage.xml || echo "coverage.xml is empty"
+      - name: Coverage Badge
+        uses: tj-actions/coverage-badge-py@v2
 
-      - name: Move Coverage XML to Root (if necessary)
-        run: mv coverage.xml $GITHUB_WORKSPACE || echo "No need to move coverage.xml"
-
-      - name: Make Coverage Badge
-        uses: action-badges/cobertura-coverage-xml-badges@0.3.1
+      - name: Verify Changed files
+        uses: tj-actions/verify-changed-files@v16
+        id: verify-changed-files
         with:
-          coverage-file-name: coverage.xml
+          files: coverage.svg
 
-      - name: Commit Coverage Badge
+      - name: Commit files
+        if: steps.verify-changed-files.outputs.files_changed == 'true'
         run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "github-actions@github.com"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
           git add coverage.svg
-          git commit -m "Update coverage badge" || echo "No changes to commit"
-          git push
-        continue-on-error: true
+          git commit -m "update coverage.svg"
 
-      - name: Upload Coverage Report
-        uses: actions/upload-artifact@v4
+      - name: Push changes
+        if: steps.verify-changed-files.outputs.files_changed == 'true'
+        uses: ad-m/github-push-action@master
         with:
-          name: coverage-report
-          path: coverage.xml
-
+          github_token: ${{ secrets.github_token }}
+          branch: ${{ github.ref }}
