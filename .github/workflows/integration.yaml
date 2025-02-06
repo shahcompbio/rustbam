@@ -42,7 +42,9 @@ jobs:
           maturin develop
 
       - name: Verify RustBam CLI
-        run: rustbam --help
+        run: |
+          source venv/bin/activate
+          rustbam --help
 
       - name: Run Tests with Coverage
         run: |
