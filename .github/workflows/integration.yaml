@@ -30,8 +30,8 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y build-essential python3-dev python3-pip cargo
 
-      - name: Install pytest
-        run: pip install pytest
+      - name: Install pytest and coverage
+        run: pip install pytest coverage
 
       - name: Build and Install RustBam
         run: |
@@ -41,5 +41,30 @@ jobs:
       - name: Verify RustBam CLI
         run: rustbam --help
 
-      - name: Run Pytest
-        run: pytest -v
+      - name: Run Tests with Coverage
+        run: |
+          coverage run -m pytest -v
+          coverage report -m
+          coverage json
+
+      - name: Generate Coverage Badge
+        uses: action-badges/cobertura-badge-action@v2
+        with:
+          coverage-file: coverage.json
+          badge-file: coverage-badge.svg
+
+      - name: Commit Coverage Badge
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git add coverage-badge.svg
+          git commit -m "Add coverage badge"
+          git push
+        continue-on-error: true  # Avoid failure if nothing to commit
+
+      - name: Upload Coverage Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage.json
+

@@ -1,6 +1,7 @@
 # 🦀`rustbam`🐍 - Rust-powered fast BAM depth extraction with Python bindings
 
 [![CI](https://github.com/shahcompbio/rustbam/actions/workflows/integration.yaml/badge.svg)](https://github.com/shahcompbio/rustbam/actions/workflows/integration.yaml)
+![Coverage](https://github.com/shahcompbio/rustbam/raw/main/coverage-badge.svg)
 
 `rustbam` is a high-performance BAM depth calculator written in **Rust**, with **Python bindings** for fast and efficient genomic data analysis.  
 (It's only a coincidence that "bam" means "snake" in Korean.)
