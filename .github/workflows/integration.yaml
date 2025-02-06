@@ -8,6 +8,9 @@ on:
     branches:
       - main
 
+env:
+  COVERAGE_PYTHON_VERSION: "3.8" # make coverage badge only for this version
+
 jobs:
   test:
     name: Test RustBam on Ubuntu with Python ${{ matrix.python-version }}
@@ -54,17 +57,17 @@ jobs:
 
       - name: Coverage Badge
         uses: tj-actions/coverage-badge-py@v2
-        if: matrix.python-version == '3.8'
+        if: matrix.python-version == env.COVERAGE_PYTHON_VERSION
 
       - name: Verify Changed files
         uses: tj-actions/verify-changed-files@v17
         id: verify-changed-files
-        if: matrix.python-version == '3.8'
+        if: matrix.python-version == env.COVERAGE_PYTHON_VERSION
         with:
           files: coverage.svg
 
       - name: Commit files
-        if: steps.verify-changed-files.outputs.files_changed == 'true' && matrix.python-version == '3.8'
+        if: steps.verify-changed-files.outputs.files_changed == 'true' && matrix.python-version == env.COVERAGE_PYTHON_VERSION
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
@@ -72,7 +75,7 @@ jobs:
           git commit -m "update coverage.svg"
 
       - name: Push changes
-        if: steps.verify-changed-files.outputs.files_changed == 'true' && matrix.python-version == '3.8'
+        if: steps.verify-changed-files.outputs.files_changed == 'true' && matrix.python-version == env.COVERAGE_PYTHON_VERSION
         uses: ad-m/github-push-action@master
         with:
           github_token: ${{ secrets.github_token }}
