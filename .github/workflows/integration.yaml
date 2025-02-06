@@ -45,20 +45,22 @@ jobs:
         run: |
           coverage run -m pytest -v
           coverage report -m
-          coverage json
+          coverage xml
 
-      - name: Generate Coverage Badge
-        uses: action-badges/cobertura-badge-action@v2
+      - name: Make Coverage Badge
+        uses: action-badges/cobertura-coverage-xml-badges@0.3.1
         with:
-          coverage-file: coverage.json
-          badge-file: coverage-badge.svg
+          file-name: coverage.svg
+          badge-branch: badges
+          github-token: '${{ secrets.GITHUB_TOKEN }}'
+          coverage-file-name: coverage.xml
 
       - name: Commit Coverage Badge
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
-          git add coverage-badge.svg
-          git commit -m "Add coverage badge"
+          git add coverage.svg
+          git commit -m "add coverage badge"
           git push
         continue-on-error: true  # Avoid failure if nothing to commit
 
@@ -66,5 +68,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
-          path: coverage.json
+          path: coverage.xml
 
