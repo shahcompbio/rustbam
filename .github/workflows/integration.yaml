@@ -35,7 +35,6 @@ jobs:
 
       - name: Build and Install RustBam
         run: |
-          pip install maturin
           maturin develop
 
       - name: Verify RustBam CLI
