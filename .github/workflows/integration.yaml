@@ -53,6 +53,14 @@ jobs:
           coverage report -m
           coverage xml
 
+      - name: Verify Coverage XML
+        run: |
+          ls -lah coverage.xml || echo "coverage.xml not found"
+          cat coverage.xml || echo "coverage.xml is empty"
+
+      - name: Move Coverage XML to Root (if necessary)
+        run: mv coverage.xml $GITHUB_WORKSPACE || echo "No need to move coverage.xml"
+
       - name: Make Coverage Badge
         uses: action-badges/cobertura-coverage-xml-badges@0.3.1
         with:
@@ -66,9 +74,9 @@ jobs:
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
           git add coverage.svg
-          git commit -m "add coverage badge"
+          git commit -m "Update coverage badge" || echo "No changes to commit"
           git push
-        continue-on-error: true  # Avoid failure if nothing to commit
+        continue-on-error: true
 
       - name: Upload Coverage Report
         uses: actions/upload-artifact@v4
