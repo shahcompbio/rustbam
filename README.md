@@ -28,7 +28,7 @@ If you need to compile from source, install **Rust** (`cargo`), **Python develop
 
 After installation, you can use `rustbam` in Python:
 
-```bash
+```python
 import rustbam
 
 positions, depths = rustbam.get_depths(
