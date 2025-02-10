@@ -96,15 +96,15 @@ You can get much faster depths result compared to samtools mpileup (as long as y
 $ time samtools mpileup /path/to/a/large/bam -r chr1:1-30000000 > /dev/null
 [mpileup] 1 samples in 1 input files
 
-real    0m52.897s
-user    0m52.270s
-sys     0m0.436s
+real    2m9.018s
+user    2m8.100s
+sys     0m0.685s
 
 $ time rustbam /path/to/a/large/bam chr1 1 30000000 -n 12 > /dev/null
 
-real    0m18.725s
-user    0m50.806s
-sys     0m6.303s
+real    0m22.038s
+user    1m40.802s
+sys     0m2.060s
 ```
 
 Don't even get me started about `pysam` (`rustbam` is about 12x fater with `-n 2`). 😠
